@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cinematic Valentine Reveal</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .card {
+    background: white;
+    border-radius: 22px;
+    box-shadow: 0 15px 30px rgba(0,0,0,.15);
+    width: 380px;
+    max-width: 92vw;
+    padding: 22px;
+    position: relative;
+  }
+
+  img {
+    width: 100%;
+    border-radius: 16px;
+    margin-bottom: 14px;
+    transition: filter 0.8s linear;
+  }
+
+  button {
+    padding: 12px 22px;
+    border-radius: 999px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 8px;
+  }
+
+  .yes { background: #ff4d6d; color: white; }
+  .no  { background: #ddd; position: absolute; }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+    font-size: 16px;
+    margin-top: 8px;
+  }
+
+  .error {
+    color: red;
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .heart {
+    position: fixed;
+    bottom: -20px;
+    font-size: 22px;
+    animation: float 5s linear forwards;
+  }
+
+  @keyframes float {
+    to {
+      transform: translateY(-110vh) scale(1.4);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+
+<body>
+<audio autoplay loop>
+  <source src="https://files.catbox.moe/0nq4zq.mp3" type="audio/mpeg">
+</audio>
+
+<div class="card" id="questionCard">
+  <img src="flowers.jpg" alt="Flowers">
+  <h2>TIFE ADEKOMAYA 💕<br>Will you be my Valentine? 💘</h2>
+  <button class="yes" onclick="yesClicked()">Yes 💖</button>
+  <button class="no" id="noBtn">No 🙃</button>
+</div>
+
+<script>
+const noBtn = document.getElementById("noBtn");
+noBtn.addEventListener("mouseover", () => {
+  noBtn.style.left = Math.random() * 250 + "px";
+  noBtn.style.top  = Math.random() * 180 + "px";
+});
+
+const VAL_DATE = new Date("February 14, 2026 00:00:00").getTime();
+let heartsStarted = false;
+let countdownTimer, blurInterval;
+
+function yesClicked() {
+  document.body.innerHTML = `
+    <div class="card">
+      <img src="tife.jpg" id="tifeImg" style="filter: blur(12px);">
+      <p style="font-size:13px;">🔐 Enter the secret code<br>
+      <em>Hint: when we started dating</em></p>
+      <input id="codeInput" placeholder="DD/MM/YY">
+      <button class="yes" onclick="checkCode()">Unlock 💖</button>
+      <div id="error" class="error"></div>
+      <div class="overlay" id="overlay">Waiting for password unlock...</div>
+    </div>
+  `;
+}
+
+function checkCode() {
+  const code = document.getElementById("codeInput").value.trim();
+  const errorEl = document.getElementById("error");
+  const overlayEl = document.getElementById("overlay");
+  if (code === "18/12/25") {
+    errorEl.textContent = "Unlocked 💕 Countdown active...";
+    startCountdown();
+  } else {
+    errorEl.textContent = "That’s not it 😌 Try again";
+  }
+}
+
+function startCountdown() {
+  const overlayEl = document.getElementById("overlay");
+  const img = document.getElementById("tifeImg");
+
+  countdownTimer = setInterval(() => {
+    const now = new Date().getTime();
+    let diff = VAL_DATE - now;
+
+    if(diff <= 0) diff = 0;
+
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff / (1000*60*60)) % 24);
+    const minutes = Math.floor((diff / (1000*60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    overlayEl.textContent = diff > 0 ? 
+      `${days}d ${hours}h ${minutes}m ${seconds}s to Valentine’s Day 💘` :
+      "Happy Valentine’s Day ❤️";
+
+    // Blur starts fading ONLY on Valentine’s Day
+    if(diff === 0 && img.style.filter !== 'blur(0px)') {
+      let blur = 12;
+      blurInterval = setInterval(() => {
+        blur -= 0.2;
+        if(blur <= 0){
+          img.style.filter = 'blur(0px)';
+          clearInterval(blurInterval);
+          startHearts();
+        } else {
+          img.style.filter = `blur(${blur}px)`;
+        }
+      }, 50);
+    }
+
+  }, 1000);
+}
+
+function startHearts() {
+  if(heartsStarted) return;
+  heartsStarted = true;
+  setInterval(() => {
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.textContent = "❤️";
+    h.style.left = Math.random() * 100 + "vw";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 5000);
+  }, 350);
+}
+</script>
+</body>
+</html>
